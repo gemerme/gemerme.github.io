@@ -32,26 +32,25 @@
         </div>
     </div>
 
-    <script>
-        // CONFIGURATION: Automatically infers settings from your current URL
-        const hostname = window.location.hostname;
-        const pathSegments = window.location.pathname.split('/').filter(Boolean);
-        
+       <script>
         // EXPLICIT HARDCODED CONFIGURATION
-        const username = "thegamemastertg304";  // Replace with your actual username
-        const repo = "thegamemastertg404.github.io";      // Replace with your actual repository name
+        const username = "thegamemastertg304";  // Replace with your real username
+        const repo = "thegamemastertg304.github.io";      // Replace with your real repo name
 
         const apiURL = `https://github.com{username}/${repo}/contents/`;
         const cdnBaseURL = `https://${username}.github.io/${repo === `${username}.github.io` ? '' : repo + '/'}`;
 
+        // The 'async' keyword here ensures the 'await' commands inside work perfectly
+        async function fetchFiles() {
+            try {
                 const response = await fetch(apiURL);
                 if (!response.ok) throw new Error("Failed to fetch repository files.");
                 const files = await response.json();
                 
                 const listElement = document.getElementById('file-list');
-                listElement.innerHTML = ''; // Clear loading screen
+                listElement.innerHTML = ''; // Clear loading placeholder
 
-                // Filter out system configurations and index itself
+                // Filter out configuration files and index itself
                 const filteredFiles = files.filter(f => f.type === 'file' && f.name !== 'index.html' && f.name !== 'README.md');
 
                 if (filteredFiles.length === 0) {
@@ -66,28 +65,25 @@
                     listElement.appendChild(li);
                 });
             } catch (error) {
-                document.getElementById('file-list').innerHTML = `<li class="placeholder" style="color:red">Error loading files. Ensure your repo is Public.</li>`;
+                document.getElementById('file-list').innerHTML = `<li class="placeholder" style="color:red">Error loading files. Check configuration values.</li>`;
             }
         }
 
         function showPreview(fileName, element) {
-            // Manage visual active state in list
             document.querySelectorAll('#file-list li').forEach(li => li.classList.remove('active'));
             element.classList.add('active');
 
             const container = document.getElementById('preview-container');
-            container.innerHTML = ''; // Reset frame
+            container.innerHTML = ''; 
             
             const fileURL = `${cdnBaseURL}${fileName}`;
             const fileExtension = fileName.split('.').pop().toLowerCase();
 
-            // Image Preview handler
             if (['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'].includes(fileExtension)) {
                 const img = document.createElement('img');
                 img.src = fileURL;
                 container.appendChild(img);
             } 
-            // PDF and Audio / Video Handler 
             else if (['pdf', 'mp3', 'mp4', 'wav'].includes(fileExtension)) {
                 const iframe = document.createElement('iframe');
                 iframe.src = fileURL;
@@ -95,10 +91,8 @@
                 iframe.style.height = "100%";
                 container.appendChild(iframe);
             } 
-            // Text / Code Files (Fetches raw text content)
             else if (['txt', 'md', 'json', 'js', 'css', 'csv', 'html'].includes(fileExtension)) {
                 const pre = document.createElement('pre');
-                const code = document.createElement('code');
                 pre.textContent = "Loading text contents...";
                 container.appendChild(pre);
                 
@@ -107,7 +101,6 @@
                     .then(text => { pre.textContent = text; })
                     .catch(() => { pre.textContent = "Error loading text preview."; });
             } 
-            // Unsupported formats (Fall-back Download Button)
             else {
                 container.innerHTML = `
                     <div class="placeholder">
@@ -117,7 +110,7 @@
             }
         }
 
-        // Run fetch on load
+        // Execute the function
         fetchFiles();
     </script>
 </body>
